@@ -1,0 +1,11 @@
+[project]
+name = "prism-console-ryan-vo"
+version = "1.0.0"
+description = "Score source-grounded command catalogs against a thin CLI baseline."
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+authors = [{name = "Ryan Vo", email = "ryandtvo@gmail.com"}]
+
+[tool.pytest.ini_options]
+testpaths = ["backend/tests"]

@@ -1,0 +1,13 @@
+.venv/
+**/node_modules/
+**/dist/
+**/__pycache__/
+.git/
+.env
+**/*.db
+**/*.sqlite
+.antigravitycli/
+.omp/
+data/
+backend/tests/
+frontend/src/**/*.test.tsx

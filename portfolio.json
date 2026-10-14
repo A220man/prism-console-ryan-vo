@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "name": "prism-console-ryan-vo",
+  "owner": "A220man",
+  "email": "ryandtvo@gmail.com",
+  "domain": "AI/ML developer tools",
+  "summary": "Work in progress: prism-console-ryan-vo",
+  "workflows": [
+    "Import declared surfaces or a supported Python and ipcMain source subset and review each command's bind result.",
+    "Compare grounded command coverage and correctness with a thin start/stop/status/chat/meeting baseline.",
+    "Run the labeled evaluation set and read precision and recall for both generators."
+  ],
+  "auth": "unauthenticated-local-checkpoint",
+  "llm_providers": [],
+  "status": "work-in-progress"
+}

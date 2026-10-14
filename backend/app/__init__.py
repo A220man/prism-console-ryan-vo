@@ -1,0 +1,1 @@
+"""Prism Console application package."""
