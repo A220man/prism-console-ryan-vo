@@ -29,8 +29,11 @@ export function EvaluationPanel({ report, error }: { report: EvaluationReport | 
                 <tr>
                   <th>Case</th>
                   <th>Grounded recall</th>
+                  <th>Grounded false positives</th>
+                  <th>Grounded false negatives</th>
                   <th>Thin recall</th>
                   <th>Thin false positives</th>
+                  <th>Thin false negatives</th>
                 </tr>
               </thead>
               <tbody>
@@ -38,8 +41,11 @@ export function EvaluationPanel({ report, error }: { report: EvaluationReport | 
                   <tr key={item.name}>
                     <td>{item.name}</td>
                     <td>{item.grounded.recall.toFixed(3)}</td>
+                    <td>{item.grounded.false_positives.length > 0 ? item.grounded.false_positives.join(", ") : "none"}</td>
+                    <td>{item.grounded.false_negatives.length > 0 ? item.grounded.false_negatives.join(", ") : "none"}</td>
                     <td>{item.thin.recall.toFixed(3)}</td>
                     <td>{item.thin.false_positives.length > 0 ? item.thin.false_positives.join(", ") : "none"}</td>
+                    <td>{item.thin.false_negatives.length > 0 ? item.thin.false_negatives.join(", ") : "none"}</td>
                   </tr>
                 ))}
               </tbody>
