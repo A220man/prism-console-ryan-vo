@@ -1,9 +1,16 @@
 # Changelog
 
+## 1.2.0 — work-in-progress checkpoint
+
+Partial code published for continued development. Known issues: STATUS.md.
+
 ## 1.1.0 — work-in-progress checkpoint
 
 Partial code published for continued development. Known issues: STATUS.md.
 
+### Improved
+
+- Evaluation panel now shows Grounded generator false positives and false negatives for each evaluation case, alongside the existing Thin generator columns. This enables complete comparison of both generators' prediction accuracy.
 ## 1.0.0 — 2026-10-21
 
 First working checkpoint of Prism Console.
