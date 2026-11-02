@@ -1,4 +1,4 @@
-import type { Analysis, AnalysisList, EvaluationReport, ExportPayload } from "./types";
+import type { Analysis, AnalysisList, EvaluationReport, ExportPayload, ReplayResult } from "./types";
 
 export class ApiError extends Error {
   readonly status: number;
@@ -87,6 +87,18 @@ export async function downloadExport(id: number, application: string): Promise<v
   link.download = `${application}-commands.json`;
   document.body.appendChild(link);
   link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
+}
+
+
+
+export function replayArgv(
+  analysisId: number,
+  commandPath: string,
+  argv: string[],
+  generator: "grounded" | "thin" = "grounded"
+): Promise<ReplayResult> {
+  return request(`/api/analyses/${analysisId}/replay`, {
+    method: "POST",
+    body: JSON.stringify({ command_path: commandPath, argv, generator }),
+  });
 }

@@ -82,3 +82,11 @@ export type ExportPayload = {
   executable_name: string;
   commands: CommandRecord[];
 };
+
+export type ReplayResult = {
+  command_path: string;
+  generator: "grounded" | "thin";
+  bound: Record<string, string>;
+  reasons: string[];
+  success: boolean;
+};

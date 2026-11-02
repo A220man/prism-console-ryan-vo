@@ -25,10 +25,14 @@ Tests: `backend/tests/test_catalog.py`, `backend/tests/test_extract.py`, `backen
 
 ### argv-replay — Replay a user-supplied argv against a saved command
 
-Status: planned
+Status: in_progress
 
 Acceptance:
 - A saved analysis accepts an argv and returns the bound parameters or the bind failure.
+
+Implementation: `backend/app/api/routes.py`, `backend/app/core/catalog.py`
+
+Tests: `backend/tests/test_api.py`
 
 ### agent-proposal-score — Score an agent-authored command list
 
