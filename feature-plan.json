@@ -36,12 +36,17 @@
     {
       "id": "argv-replay",
       "title": "Replay a user-supplied argv against a saved command",
-      "status": "planned",
+      "status": "in_progress",
       "acceptance": [
         "A saved analysis accepts an argv and returns the bound parameters or the bind failure."
       ],
-      "implementation": [],
-      "tests": []
+      "implementation": [
+        "backend/app/api/routes.py",
+        "backend/app/core/catalog.py"
+      ],
+      "tests": [
+        "backend/tests/test_api.py"
+      ]
     },
     {
       "id": "agent-proposal-score",

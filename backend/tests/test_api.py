@@ -93,3 +93,63 @@ def test_sample_and_evaluation_endpoints(tmp_path):
     assert evaluation.status_code == 200
     assert evaluation.json()["grounded"]["recall"] == 1
     assert evaluation.json()["thin"]["recall"] < 1
+def test_replay_argv_binds_and_reports_failure(tmp_path):
+    client = _client(tmp_path)
+    created = client.post("/api/analyses", json=SURFACE_SAMPLE)
+    analysis_id = created.json()["id"]
+
+    # Successful replay: provide required --title flag
+    replay = client.post(
+        f"/api/analyses/{analysis_id}/replay",
+        json={"command_path": "notes create_note", "argv": ["--title", "my note"], "generator": "grounded"},
+    )
+    assert replay.status_code == 200
+    body = replay.json()
+    assert body["success"] is True
+    assert body["bound"] == {"title": "my note"}
+    assert body["reasons"] == []
+
+    # Failed replay: missing required flag
+    replay_missing = client.post(
+        f"/api/analyses/{analysis_id}/replay",
+        json={"command_path": "notes create_note", "argv": [], "generator": "grounded"},
+    )
+    assert replay_missing.status_code == 200
+    body_missing = replay_missing.json()
+    assert body_missing["success"] is False
+    assert any("required parameter missing: title" in r for r in body_missing["reasons"])
+
+    # Failed replay: unknown flag
+    replay_unknown = client.post(
+        f"/api/analyses/{analysis_id}/replay",
+        json={"command_path": "notes create_note", "argv": ["--unknown", "value"], "generator": "grounded"},
+    )
+    assert replay_unknown.status_code == 200
+    body_unknown = replay_unknown.json()
+    assert body_unknown["success"] is False
+    assert any("unknown flag: unknown" in r for r in body_unknown["reasons"])
+
+    # Not found: wrong command path
+    replay_not_found = client.post(
+        f"/api/analyses/{analysis_id}/replay",
+        json={"command_path": "nonexistent command", "argv": ["--title", "x"], "generator": "grounded"},
+    )
+    assert replay_not_found.status_code == 404
+
+    # Not found: wrong analysis id
+    replay_bad_id = client.post(
+        "/api/analyses/999/replay",
+        json={"command_path": "notes create_note", "argv": ["--title", "x"], "generator": "grounded"},
+    )
+    assert replay_bad_id.status_code == 404
+
+    # Thin generator: no params, so unknown flag fails
+    replay_thin = client.post(
+        f"/api/analyses/{analysis_id}/replay",
+        json={"command_path": "app start", "argv": ["--foo", "bar"], "generator": "thin"},
+    )
+    assert replay_thin.status_code == 200
+    body_thin = replay_thin.json()
+    assert body_thin["generator"] == "thin"
+    assert body_thin["success"] is False
+    assert any("unknown flag: foo" in r for r in body_thin["reasons"])

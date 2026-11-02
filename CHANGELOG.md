@@ -1,9 +1,16 @@
 # Changelog
 
+## 1.3.0 — work-in-progress checkpoint
+
+Partial code published for continued development. Known issues: STATUS.md.
+
 ## 1.2.0 — work-in-progress checkpoint
 
 Partial code published for continued development. Known issues: STATUS.md.
 
+### Added
+
+- **argv-replay endpoint**: POST `/api/analyses/{analysis_id}/replay` accepts a command path and argv, returning bound parameters or bind failures using the existing `bind_argv` logic. Supports both grounded and thin generator commands.
 ## 1.1.0 — work-in-progress checkpoint
 
 Partial code published for continued development. Known issues: STATUS.md.
