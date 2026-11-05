@@ -104,7 +104,7 @@ def replay_argv(
             if surface_id and surface_id in surfaces_by_id:
                 params = surfaces_by_id[surface_id].get("params", [])
             else:
-                # For thin commands or commands without surface_id, reconstruct from argv
+                # For commands without surface_id, no params available
                 params = []
             bound, reasons = bind_argv(params, argv)
             return {
