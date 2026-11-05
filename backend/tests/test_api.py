@@ -153,3 +153,58 @@ def test_replay_argv_binds_and_reports_failure(tmp_path):
     assert body_thin["generator"] == "thin"
     assert body_thin["success"] is False
     assert any("unknown flag: foo" in r for r in body_thin["reasons"])
+
+def test_replay_argv_thin_with_bound_surface(tmp_path):
+    """Thin generator replay works when surface is bound to a thin verb."""
+    from app.core.samples import SURFACE_SAMPLE
+    import copy
+    
+    # Create a sample with a surface that binds to "start" thin verb
+    sample = copy.deepcopy(SURFACE_SAMPLE)
+    sample["surfaces"].append({
+        "id": "app.start",
+        "kind": "ipc",
+        "module": "app",
+        "handler": "start",
+        "summary": "Start the application",
+        "params": [
+            {"name": "mode", "type": "string", "required": True},
+            {"name": "verbose", "type": "boolean", "required": False},
+        ],
+    })
+    
+    client = _client(tmp_path)
+    created = client.post("/api/analyses", json=sample)
+    analysis_id = created.json()["id"]
+    
+    # Thin generator: command "app start" should have surface params
+    replay = client.post(
+        f"/api/analyses/{analysis_id}/replay",
+        json={"command_path": "app start", "argv": ["--mode", "dev"], "generator": "thin"},
+    )
+    assert replay.status_code == 200
+    body = replay.json()
+    assert body["generator"] == "thin"
+    assert body["success"] is True
+    assert body["bound"] == {"mode": "dev"}
+    assert body["reasons"] == []
+    
+    # Missing required param
+    replay_missing = client.post(
+        f"/api/analyses/{analysis_id}/replay",
+        json={"command_path": "app start", "argv": [], "generator": "thin"},
+    )
+    assert replay_missing.status_code == 200
+    body_missing = replay_missing.json()
+    assert body_missing["success"] is False
+    assert any("required parameter missing: mode" in r for r in body_missing["reasons"])
+    
+    # Unknown flag
+    replay_unknown = client.post(
+        f"/api/analyses/{analysis_id}/replay",
+        json={"command_path": "app start", "argv": ["--unknown", "value"], "generator": "thin"},
+    )
+    assert replay_unknown.status_code == 200
+    body_unknown = replay_unknown.json()
+    assert body_unknown["success"] is False
+    assert any("unknown flag: unknown" in r for r in body_unknown["reasons"])
