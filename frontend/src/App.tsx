@@ -13,6 +13,7 @@ import { CatalogReport } from "./components/CatalogReport";
 import { EvaluationPanel } from "./components/EvaluationPanel";
 import { HistoryList } from "./components/HistoryList";
 import { InventoryPanel } from "./components/InventoryPanel";
+import { ReplayPanel } from "./components/ReplayPanel";
 import type { Analysis, AnalysisList, EvaluationReport } from "./types";
 
 export function App() {
@@ -30,76 +31,59 @@ export function App() {
 
   async function refresh(application: string, offset: number) {
     setListLoading(true);
+    setListError("");
     try {
-      const next = await listAnalyses(application, offset);
-      setPage(next);
-      setListError("");
-    } catch (error) {
-      setListError(errorMessage(error));
+      const data = await listAnalyses(application, offset);
+      setPage(data);
+    } catch (e) {
+      setListError(errorMessage(e));
     } finally {
       setListLoading(false);
     }
   }
 
   useEffect(() => {
-    getHealth()
-      .then((health) => setVersion(health.version))
-      .catch(() => setVersion(""));
-    void refresh("", 0);
+    getHealth().then((h) => setVersion(h.version)).catch(() => {});
+    void refresh("lane-desk", 0);
     getEvaluation()
-      .then(setEvaluation)
-      .catch((error) => setEvaluationError(errorMessage(error)));
+      .then((e) => setEvaluation(e))
+      .catch((e) => setEvaluationError(errorMessage(e)));
   }, []);
 
   async function loadSample(kind: "surfaces" | "python") {
-    setFormError("");
-    try {
-      const sample = await getSample(kind);
-      setDraft(JSON.stringify(sample, null, 2));
-    } catch (error) {
-      setFormError(errorMessage(error));
-    }
+    const sample = await getSample(kind);
+    setDraft(JSON.stringify(sample, null, 2));
   }
 
   async function buildCatalog() {
+    setBusy(true);
+    setFormError("");
     let payload: unknown;
     try {
       payload = JSON.parse(draft);
     } catch {
       setFormError("Inventory JSON could not be parsed");
+      setBusy(false);
       return;
     }
-    setBusy(true);
-    setFormError("");
     try {
       const created = await createAnalysis(payload);
       setReport(created);
-      await refresh(query, 0);
-    } catch (error) {
-      setFormError(errorMessage(error));
+      void refresh(created.application, 0);
+    } catch (e) {
+      setFormError(errorMessage(e));
     } finally {
       setBusy(false);
     }
   }
 
   async function openAnalysis(id: number) {
-    setFormError("");
-    try {
-      setReport(await getAnalysis(id));
-    } catch (error) {
-      setFormError(errorMessage(error));
-    }
+    const data = await getAnalysis(id);
+    setReport(data);
   }
 
   async function exportReport(id: number) {
-    if (!report) {
-      return;
-    }
-    try {
-      await downloadExport(id, report.application);
-    } catch (error) {
-      setFormError(errorMessage(error));
-    }
+    await downloadExport(id, report?.application ?? "lane-desk");
   }
 
   return (
@@ -136,7 +120,9 @@ export function App() {
         />
       </div>
       <CatalogReport report={report} onExport={(id) => void exportReport(id)} />
+      <ReplayPanel report={report} />
       <EvaluationPanel report={evaluation} error={evaluationError} />
     </main>
   );
 }
+

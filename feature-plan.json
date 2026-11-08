@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "current_feature": "catalog-from-surfaces",
+  "current_feature": "argv-replay",
   "features": [
     {
       "id": "catalog-from-surfaces",
@@ -36,16 +36,19 @@
     {
       "id": "argv-replay",
       "title": "Replay a user-supplied argv against a saved command",
-      "status": "in_progress",
+      "status": "done",
       "acceptance": [
         "A saved analysis accepts an argv and returns the bound parameters or the bind failure."
       ],
       "implementation": [
         "backend/app/api/routes.py",
-        "backend/app/core/catalog.py"
+        "backend/app/core/catalog.py",
+        "frontend/src/components/ReplayPanel.tsx",
+        "frontend/src/App.tsx"
       ],
       "tests": [
-        "backend/tests/test_api.py"
+        "backend/tests/test_api.py",
+        "frontend/src/App.test.tsx"
       ]
     },
     {
@@ -82,3 +85,4 @@
     }
   ]
 }
+
