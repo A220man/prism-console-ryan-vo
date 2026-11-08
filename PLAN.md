@@ -4,7 +4,7 @@ Each round completes one feature or repair. Future items are planned, not implem
 
 ## Current round
 
-catalog-from-surfaces
+argv-replay
 
 ## Roadmap
 
@@ -25,14 +25,14 @@ Tests: `backend/tests/test_catalog.py`, `backend/tests/test_extract.py`, `backen
 
 ### argv-replay — Replay a user-supplied argv against a saved command
 
-Status: in_progress
+Status: done
 
 Acceptance:
 - A saved analysis accepts an argv and returns the bound parameters or the bind failure.
 
-Implementation: `backend/app/api/routes.py`, `backend/app/core/catalog.py`
+Implementation: `backend/app/api/routes.py`, `backend/app/core/catalog.py`, `frontend/src/components/ReplayPanel.tsx`, `frontend/src/App.tsx`
 
-Tests: `backend/tests/test_api.py`
+Tests: `backend/tests/test_api.py`, `frontend/src/App.test.tsx`
 
 ### agent-proposal-score — Score an agent-authored command list
 
