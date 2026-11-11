@@ -1,8 +1,17 @@
 # Changelog
 
+## 1.6.0 — work-in-progress checkpoint
+
+Partial code published for continued development. Known issues: STATUS.md.
+
 ## 1.5.0 — work-in-progress checkpoint
 
 Partial code published for continued development. Known issues: STATUS.md.
+
+### Improved
+
+- **argv parsing in Replay Panel**: Added shell-style argument parsing (`parseArgv` utility) that properly handles quoted values, escaped characters, and mixed quoting styles. Users can now enter arguments like `--title "my note" --body 'text with "quotes"'` and they will be correctly parsed into argv arrays.
+- Added comprehensive tests for the argv parser covering quoted strings, escaped quotes, backslash escapes, equals-sign flags, and mixed quote styles.
 
 ## 1.4.0 — work-in-progress checkpoint
 

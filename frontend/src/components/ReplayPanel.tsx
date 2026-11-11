@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { replayArgv } from "../api";
+import { parseArgv } from "../utils/argv";
 import type { Analysis, CommandRecord, ReplayResult } from "../types";
 
 type ReplayPanelProps = {
@@ -37,7 +38,7 @@ export function ReplayPanel({ report }: ReplayPanelProps) {
     setLoading(true);
     setError("");
     try {
-      const argv = argvInput.trim() ? argvInput.trim().split(/\s+/) : [];
+      const argv = argvInput.trim() ? parseArgv(argvInput.trim()) : [];
       const res = await replayArgv(report.id, selectedCommand.path, argv, generator);
       setResult(res);
     } catch (e) {
@@ -150,4 +151,3 @@ export function ReplayPanel({ report }: ReplayPanelProps) {
     </section>
   );
 }
-
