@@ -54,12 +54,16 @@
     {
       "id": "agent-proposal-score",
       "title": "Score an agent-authored command list",
-      "status": "planned",
+      "status": "in_progress",
       "acceptance": [
         "A pasted command list is compared with the grounded executable set and returns precision and recall."
       ],
-      "implementation": [],
-      "tests": []
+      "implementation": [
+        "backend/app/api/routes.py (new /score endpoint)"
+      ],
+      "tests": [
+        "backend/tests/test_agent_proposal_score.py (new test)"
+      ]
     },
     {
       "id": "llm-advisory",
@@ -85,4 +89,3 @@
     }
   ]
 }
-
