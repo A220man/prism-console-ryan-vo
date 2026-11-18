@@ -36,10 +36,14 @@ Tests: `backend/tests/test_api.py`, `frontend/src/App.test.tsx`
 
 ### agent-proposal-score — Score an agent-authored command list
 
-Status: planned
+Status: in_progress
 
 Acceptance:
 - A pasted command list is compared with the grounded executable set and returns precision and recall.
+
+Implementation: `backend/app/api/routes.py (new /score endpoint)`
+
+Tests: `backend/tests/test_agent_proposal_score.py (new test)`
 
 ### llm-advisory — Optional advisory explanation of bind failures
 
