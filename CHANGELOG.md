@@ -1,6 +1,17 @@
 # Changelog
 
+## 1.8.0 — work-in-progress checkpoint
+
+Partial code published for continued development. Known issues: STATUS.md.
+
+## 1.7.1 — work-in-progress checkpoint
+
+### Added
+
+- **Agent proposal scoring**: `POST /api/analyses/{id}/score` accepts `{"commands": [...]}` and returns precision/recall against the saved analysis's grounded executable commands, plus `missed`/`unexpected` lists. Pasted lines may include argv after the path; it is stripped before matching. Implemented in `app/core/evaluate.py` (`score_proposal`) with tests in `backend/tests/test_agent_proposal_score.py`.
+
 ## 1.7.0 — work-in-progress checkpoint
+ — work-in-progress checkpoint
 
 Partial code published for continued development. Known issues: STATUS.md.
 

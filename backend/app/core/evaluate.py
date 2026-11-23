@@ -10,6 +10,7 @@ import json
 import sys
 
 from app.core.catalog import propose
+from app.core.errors import CatalogError
 from app.core.samples import SURFACE_SAMPLE
 
 FAILURE_CASES = [
@@ -173,6 +174,47 @@ def run_evaluation(cases: list[dict] | None = None) -> dict:
         "cases": rows,
         "failure_cases": list(FAILURE_CASES),
     }
+
+
+def score_proposal(commands: object, gold_commands: list[dict]) -> dict:
+    """Score a pasted command list against the executable paths of a catalog.
+
+    ``commands`` is a list of single-line command strings in the ``group verb``
+    form the catalog reports. Each line is reduced to its path (tokens before
+    the first ``--`` flag), so argv pasted alongside a command is ignored.
+    Whitespace is collapsed and matching is exact against the executable
+    command paths of ``gold_commands``. ``precision`` and ``recall`` come from
+    the shared :func:`_score` helper, matching the labeled evaluation.
+    """
+    if not isinstance(commands, list):
+        raise CatalogError("commands must be a list of strings", "commands")
+    gold = {
+        command["path"]
+        for command in gold_commands
+        if command.get("executable") and command.get("path")
+    }
+    predicted: set[str] = set()
+    for entry in commands:
+        if not isinstance(entry, str):
+            raise CatalogError("commands must be a list of strings", "commands")
+        path = _command_path(entry)
+        if path:
+            predicted.add(path)
+    scored = _score(predicted, gold)
+    scored["missed"] = sorted(gold - predicted)
+    scored["unexpected"] = sorted(predicted - gold)
+    scored["gold"] = len(gold)
+    return scored
+
+
+def _command_path(line: str) -> str:
+    """Reduce a pasted command line to its whitespace-collapsed path."""
+    path_tokens: list[str] = []
+    for token in line.split():
+        if token.startswith("--"):
+            break
+        path_tokens.append(token)
+    return " ".join(path_tokens)
 
 
 def _score(predicted: set[str], gold: set[str]) -> dict:
