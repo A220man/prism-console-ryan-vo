@@ -13,5 +13,5 @@
   "auth": "unauthenticated-local-checkpoint",
   "llm_providers": [],
   "status": "work-in-progress",
-  "version": "1.7.0"
+  "version": "1.8.0"
 }

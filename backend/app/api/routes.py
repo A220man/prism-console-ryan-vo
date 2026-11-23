@@ -1,6 +1,4 @@
 """Catalog, history, evaluation, and replay routes."""
-import json
-
 from typing import Any
 
 from fastapi import APIRouter, Body, Request
@@ -8,7 +6,7 @@ from fastapi.responses import JSONResponse
 
 from app.core.catalog import bind_argv, propose, require_page
 from app.core.errors import CatalogError
-from app.core.evaluate import run_evaluation, _score
+from app.core.evaluate import run_evaluation, score_proposal
 from app.core.samples import PYTHON_SAMPLE, SURFACE_SAMPLE
 from app.core.version import read_version
 from app.models.schemas import analysis_response, audit_response, export_payload
@@ -118,56 +116,17 @@ def replay_argv(
     return JSONResponse(status_code=404, content={"error": "command not found", "field": "command_path"})
 
 @router.post("/analyses/{analysis_id}/score", response_model=None)
-def score_agent_commands_endpoint(
+def score_agent_commands(
     request: Request,
-    payload: dict = Body(...),
+    analysis_id: int,
+    commands: list[str] = Body(..., embed=True),
 ) -> dict | JSONResponse:
-    """Score agent-pasted commands against the grounded catalog."""
-    from app.core.evaluate import _score
-    
-    analysis_id = payload.get("analysis_id")
-    if not analysis_id:
-        return JSONResponse(
-            status_code=400,
-            content={"error": "missing analysis_id", "field": "analysis_id"},
-        )
-    
-    store: Store = request.app.state.store
-    analysis = store.get_analysis(analysis_id)
-    if analysis is None:
-        return JSONResponse(
-            status_code=404,
-            content={"error": "analysis not found", "field": "id"},
-        )
-    
-    # Use the grounded commands from the analysis result
-    # analysis has result_json stored which contains grounded commands
-    grounded_commands = analysis.get("result", {}).get("grounded", {}).get("commands", [])
-    grounded_paths = {
-        cmd["path"] for cmd in grounded_commands if cmd.get("executable")
-    }
-    
-    # Extract pasted command paths from payload
-    pasted_commands = set(payload.get("commands", []))
-    
-    # Compute scores
-    scores = _score(pasted_commands, grounded_paths)
-    
-    # Compute false negatives: grounded paths not in pasted commands
-    false_negatives = list(grounded_paths - pasted_commands)
-    
-    return JSONResponse(
-        status_code=200,
-        content={
-            "precision": scores["precision"],
-            "recall": scores["recall"],
-            "true_positives": scores["true_positives"],
-            "false_positives": scores["false_positives"],
-            "false_negatives": false_negatives,
-            "predicted": scores["predicted"],
-            "gold": len(grounded_commands),
-        },
-    )
+    """Score a pasted command list against a saved analysis's grounded commands."""
+    record = request.app.state.store.get_analysis(analysis_id)
+    if record is None:
+        return _missing()
+    scored = score_proposal(commands, record["result"]["grounded"]["commands"])
+    return {"analysis_id": analysis_id, **scored}
 
 
 @router.get("/audit")
