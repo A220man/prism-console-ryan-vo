@@ -4,7 +4,7 @@ Each round completes one feature or repair. Future items are planned, not implem
 
 ## Current round
 
-argv-replay
+llm-advisory
 
 ## Roadmap
 
@@ -47,11 +47,15 @@ Tests: `backend/tests/test_agent_proposal_score.py`
 
 ### llm-advisory — Optional advisory explanation of bind failures
 
-Status: planned
+Status: done
 
 Acceptance:
 - When LLM_API_KEY is set, a failure explanation is requested from the configured provider and labeled advisory.
 - Missing or failing provider calls return an error and do not invent a successful explanation.
+
+Implementation: `backend/app/services/llm_advisory.py`, `backend/app/api/routes.py`
+
+Tests: `backend/tests/test_llm_advisory.py`
 
 ### oidc-session — Keycloak OIDC login and role checks
 
