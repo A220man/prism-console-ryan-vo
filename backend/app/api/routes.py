@@ -10,6 +10,7 @@ from app.core.evaluate import run_evaluation, score_proposal
 from app.core.samples import PYTHON_SAMPLE, SURFACE_SAMPLE
 from app.core.version import read_version
 from app.models.schemas import analysis_response, audit_response, export_payload
+from app.services.llm_advisory import explain_bind_failure
 
 router = APIRouter()
 
@@ -115,6 +116,32 @@ def replay_argv(
             }
     return JSONResponse(status_code=404, content={"error": "command not found", "field": "command_path"})
 
+
+@router.post("/analyses/{analysis_id}/advisory", response_model=None)
+def advisory_argv(
+    request: Request,
+    analysis_id: int,
+    argv: list[str] = Body(...),
+) -> dict | JSONResponse:
+    """Return an LLM advisory explanation of a bind failure.
+
+    When ``LLM_API_KEY`` is set the configured provider is queried; otherwise
+    an error is returned.  Missing or failing provider calls return an error
+    and do not invent a successful explanation.
+    """
+    record = request.app.state.store.get_analysis(analysis_id)
+    if record is None:
+        return _missing()
+
+    inventory = record["inventory"]
+    surfaces = inventory.get("surfaces", [])
+
+    result = explain_bind_failure(argv, surfaces)
+    if "advisory" in result:
+        return {"advisory": result["advisory"]}
+    return JSONResponse(status_code=502, content={"error": result["error"]})
+
+
 @router.post("/analyses/{analysis_id}/score", response_model=None)
 def score_agent_commands(
     request: Request,
@@ -138,3 +165,5 @@ def list_audit(request: Request, limit: int = 20, offset: int = 0) -> dict:
 
 def _missing() -> JSONResponse:
     return JSONResponse(status_code=404, content={"error": "analysis not found", "field": "id"})
+
+

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "current_feature": "argv-replay",
+  "current_feature": "llm-advisory",
   "features": [
     {
       "id": "catalog-from-surfaces",
@@ -69,13 +69,18 @@
     {
       "id": "llm-advisory",
       "title": "Optional advisory explanation of bind failures",
-      "status": "planned",
+      "status": "done",
       "acceptance": [
         "When LLM_API_KEY is set, a failure explanation is requested from the configured provider and labeled advisory.",
         "Missing or failing provider calls return an error and do not invent a successful explanation."
       ],
-      "implementation": [],
-      "tests": []
+      "implementation": [
+        "backend/app/services/llm_advisory.py",
+        "backend/app/api/routes.py"
+      ],
+      "tests": [
+        "backend/tests/test_llm_advisory.py"
+      ]
     },
     {
       "id": "oidc-session",
